@@ -19,7 +19,7 @@ const Statistics = (props) => {
   let all = good + neutral + bad
   let avg = ((good * 1) + (neutral * 0) + (bad * -1)) / all || 0
   let pos = (good * 100) / all || 0
-  return (
+  if (!(good === 0 && neutral === 0 && bad === 0)) {return (
     <div>
     <h1>Statistics</h1>
     <DisplayStatistics text="Good" value={good}/>
@@ -29,7 +29,15 @@ const Statistics = (props) => {
     <DisplayStatistics text="Average" value={avg}/>
     <DisplayStatistics text="Positive" value={`${pos}%`}/>
     </div>
-  )
+  )}
+  else {
+    return (
+      <div>
+      <h1>Statistics</h1>
+      No feedback given
+      </div>
+    )
+  }
 }
 
 const App = () => {
