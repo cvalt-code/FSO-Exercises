@@ -12,7 +12,25 @@ const DisplayStatistics = (props) => (
   </div>
 )
 
-
+const Statistics = (props) => {
+  let good = props.good 
+  let bad = props.bad 
+  let neutral = props.neutral
+  let all = good + neutral + bad
+  let avg = ((good * 1) + (neutral * 0) + (bad * -1)) / all || 0
+  let pos = (good * 100) / all || 0
+  return (
+    <div>
+    <h1>Statistics</h1>
+    <DisplayStatistics text="Good" value={good}/>
+    <DisplayStatistics text="Neutral" value={neutral}/>
+    <DisplayStatistics text="Bad" value={bad}/>
+    <DisplayStatistics text="All" value={all}/>
+    <DisplayStatistics text="Average" value={avg}/>
+    <DisplayStatistics text="Positive" value={`${pos}%`}/>
+    </div>
+  )
+}
 
 const App = () => {
   // save clicks of each button to its own state
@@ -39,13 +57,7 @@ const App = () => {
     <div>
       <h1>give feedback</h1>
       <Button onClick={() => setToGood(good + 1)} text="Good" /> <Button onClick={() => setToNeutral(neutral + 1)} text="Neutral" /> <Button onClick={() => setToBad(bad + 1)} text="Bad" />
-      <h1>Statistics</h1>
-      <DisplayStatistics text="Good" value={good}/>
-      <DisplayStatistics text="Neutral" value={neutral}/>
-      <DisplayStatistics text="Bad" value={bad}/>
-      <DisplayStatistics text="All" value={all}/>
-      <DisplayStatistics text="Average" value={avg}/>
-      <DisplayStatistics text="Positive" value={`${pos}%`}/>
+      <Statistics good={good} bad={bad} neutral={neutral}/>
     </div>
   )
 }
