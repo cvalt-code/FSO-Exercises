@@ -20,10 +20,17 @@ const App = () => {
   const personObject = {
     name: newName,
   }
+  const isRepeated = persons.some(person => person.name === newName);
+  if (isRepeated) {
+    alert(`${newName} is already added to the phonebook`)
+    setNewName('');
+    
+  }
+  else {
   console.log(personObject);
   
   setPersons(persons.concat(personObject))
-  setNewName('')
+  setNewName('')}
 }
 
   return (
