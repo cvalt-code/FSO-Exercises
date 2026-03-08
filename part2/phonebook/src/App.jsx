@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import personService from './services/persons'
 
-const Person = ({ person }) => {
-  return <li>{person.name} {person.number}</li>
+const Person = ({ person, deletePerson }) => {
+  return <li>{person.name} {person.number} <button onClick={() => deletePerson(person)}>Delete</button></li>
 }
 
 const Filter = (props) => {
@@ -25,9 +26,11 @@ const PersonForm = (props) => {
 
 }
 
+
+
 const Persons = (props) => {
   return (
-    props.personsFiltered.map((person, i) => (<Person key={i} person={person}/>))
+    props.personsFiltered.map((person, i) => (<Person key={i} person={person} deletePerson={props.deletePerson}/>))
   )
 }
 
@@ -39,11 +42,12 @@ const App = () => {
 
   useEffect(() => {
   console.log('effect')
-  axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
+  personService
+    .getAll()
+    .then(
+      response => {
       console.log('promise fulfilled')
-      setPersons(response.data)
+      setPersons(response)
     })
 }, [])
   const handleNoteChange = (event) => {    
@@ -73,12 +77,31 @@ const App = () => {
   }
   else {
   console.log(personObject);
-  
-  setPersons(persons.concat(personObject))
-  setNewName('')
-  setNewNumber('');}
+    personService
+    .create(personObject)
+    .then(returnedPerson => {      
+      console.log(returnedPerson)
+      setPersons(persons.concat(returnedPerson))      
+      setNewName('')
+    setNewNumber('')})
+  ;}
 }
 
+const deletePerson = (props) =>
+{console.log(props)
+  if (window.confirm("Do you want to delete person " + props.name)) {return(
+    personService
+    .deleteId(props.id)
+    .then(returnedPerson => {      
+      console.log(returnedPerson)
+      setPersons(persons.filter(p => p.id !== props.id))    
+      }
+  ))
+}
+else{
+  console.log("Not deleting ID ", props)
+}}
+  console.log(persons)
   const personsFiltered = persons.filter(person => String(person.name.toLowerCase()).startsWith(newFilter.toLowerCase()))
   console.log(personsFiltered)
 
@@ -89,7 +112,7 @@ const App = () => {
       <h3>Add a new person</h3>
       <PersonForm addPerson={addPerson} newName={newName} handleNoteChange={handleNoteChange} newNumber={newNumber} handleNumberChange={handleNumberChange}/>
       <h2>Numbers</h2>
-      <Persons personsFiltered={personsFiltered}/>
+      <Persons personsFiltered={personsFiltered} deletePerson={deletePerson}/>
     </div>
   )
 }
