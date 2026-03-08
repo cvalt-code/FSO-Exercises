@@ -68,9 +68,23 @@ const App = () => {
     name: newName,
     number: newNumber,
   }
-  const isRepeated = persons.some(person => person.name === newName);
+  const isRepeated = persons.some(person => person.name.toLowerCase() === newName.toLowerCase());
   if (isRepeated) {
-    alert(`${newName} is already added to the phonebook`)
+    const personRepeated = persons.filter(person => person.name.toLowerCase() === newName.toLowerCase())[0];
+    console.log(personRepeated)
+     if (window.confirm(`${newName} is already added to the phonebook replace the old number with a new one?`)) {
+      return(
+    personService
+    .update(personRepeated.id, personObject)
+    .then(returnedPerson => {      
+      console.log(returnedPerson)
+      setPersons(persons.map(p => p.id === personRepeated.id ? returnedPerson : p))   
+      }
+        ))
+      }
+      else{
+        console.log("Not updating ID ", personRepeated.id)
+      }
     setNewName('');
     setNewNumber('');
     
