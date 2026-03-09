@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons'
+import Notification from './components/Notification'
+import NotificationError from './components/NotificationError'
+import './index.css'
 
 const Person = ({ person, deletePerson }) => {
   return <li>{person.name} {person.number} <button onClick={() => deletePerson(person)}>Delete</button></li>
@@ -39,6 +42,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [newAddedMessage, setNewAddedMessage] = useState(null)
+  const [newErrorMessage, setNewErrorMessage] = useState(null)
 
   useEffect(() => {
   console.log('effect')
@@ -78,7 +83,11 @@ const App = () => {
     .update(personRepeated.id, personObject)
     .then(returnedPerson => {      
       console.log(returnedPerson)
-      setPersons(persons.map(p => p.id === personRepeated.id ? returnedPerson : p))   
+      setPersons(persons.map(p => p.id === personRepeated.id ? returnedPerson : p)) 
+      setNewAddedMessage(`${returnedPerson.name} successfully edited`)
+      setTimeout(() => {          
+        setNewAddedMessage(null)        
+      }, 5000)   
       }
         ))
       }
@@ -95,7 +104,11 @@ const App = () => {
     .create(personObject)
     .then(returnedPerson => {      
       console.log(returnedPerson)
-      setPersons(persons.concat(returnedPerson))      
+      setPersons(persons.concat(returnedPerson)) 
+      setNewAddedMessage(`${returnedPerson.name} successfully added`)
+      setTimeout(() => {          
+        setNewAddedMessage(null)        
+      }, 5000) 
       setNewName('')
     setNewNumber('')})
   ;}
@@ -109,8 +122,17 @@ const deletePerson = (props) =>
     .then(returnedPerson => {      
       console.log(returnedPerson)
       setPersons(persons.filter(p => p.id !== props.id))    
-      }
-  ))
+      })
+    .catch(error => {
+        setNewErrorMessage(          
+          `Person '${props.name}' was already removed from server`        
+        )        
+        setTimeout(() => {          
+          setNewErrorMessage(null)        
+        }, 5000)        
+        setPersons(persons.filter(p => p.id !== props.id)) 
+      })
+  )
 }
 else{
   console.log("Not deleting ID ", props)
@@ -122,6 +144,8 @@ else{
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={newAddedMessage}/>
+      <NotificationError message={newErrorMessage}/>
       <Filter value={newFilter} onChange={handleFilterChange} />
       <h3>Add a new person</h3>
       <PersonForm addPerson={addPerson} newName={newName} handleNoteChange={handleNoteChange} newNumber={newNumber} handleNumberChange={handleNumberChange}/>
