@@ -4,7 +4,7 @@ import axios from 'axios'
 
 const CountryDisplay = ({name}) => {
   const [countryData, setCountryData] = useState(null)
-
+  const [countryWeather, setCountryWeather] = useState(null)
   useEffect(() => {
     axios
   .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${name}`)
@@ -14,11 +14,33 @@ const CountryDisplay = ({name}) => {
   )
 
   }, [name])
-  if (!countryData) {
+
+  
+  useEffect(() => {
+    if (countryData){
+      // We use the first capital in the array
+    const capital = countryData.capital[0]
+    const API_KEY = import.meta.env.VITE_WEATHER_API_KEY
+    axios
+    .get(`https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${API_KEY}&units=metric`)  
+    .then( response => {
+    setCountryWeather(response.data)
+
+  }
+  )}
+
+  }, [countryData])
+
+  if (!countryData ) {
     return <div>Loading details for {name}...</div>
+  }
+  if (!countryWeather ) {
+    return <div>Loading weather for {name}...</div>
   }
   else {
     console.log(countryData)
+    console.log(countryWeather)
+    console.log(countryWeather.weather[0].icon)
   }
 
   return(
@@ -32,13 +54,21 @@ const CountryDisplay = ({name}) => {
         {Object.values(countryData.languages).map(l => (<li key={l}>{l}</li>))}
       </ul>
       <img src={countryData.flags.svg} width="300" height="200"/>
-    
+      <h2> Weather in {countryData.capital[0]}</h2>
+      <p>Temperature {countryWeather.main.temp} Celsius</p>
+      <img src={`https://openweathermap.org/payload/api/media/file/${countryWeather.weather[0].icon}.png`}/> 
+      <p>Wind {countryWeather.wind.speed} m/s</p>   
     </div>
   )
 }
 
 const Country = (props) => {
   console.log(props.countryList)
+  const handleButtonClick = (name) => {
+  return(
+    props.setCountry(name)
+  )
+}
   if (props.countryList.length > 10) {
     return(
       <div> Too many matches, specify another filter</div>
@@ -53,7 +83,7 @@ const Country = (props) => {
   else {
     return(
       <ul>
-      {props.countryList.map(name => <li key={name.common}>{name.common}</li>)}
+      {props.countryList.map(name => <li key={name.common}>{name.common} <button onClick={() => handleButtonClick(name.common)}>show</button></li>)}
     </ul>
     )
   }
@@ -97,7 +127,7 @@ useEffect(() => {
   return (
     <div>
        find countries <input value={country} onChange={handleCountryChange}/>
-       <Country countryList={countriesFiltered}></Country>
+       <Country countryList={countriesFiltered} setCountry={setCountry}></Country>
     </div>
   )
 }
