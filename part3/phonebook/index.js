@@ -32,6 +32,19 @@ app.get('/api/persons', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
+  
+  if (!body.name || !body.number) {
+  return response.status(400).json({ 
+    error: 'Name or Number missing' 
+  })
+}
+  const listOfNames = persons.map(person => person.name.toLowerCase())
+  if (listOfNames.includes(body.name.toLowerCase())) {
+    return response.status(400).json({ 
+    error: 'Name already exists in database, name must be unique' 
+  })
+  }
+  console.log(listOfNames)
   const person = {
     id:String(Math.floor(Math.random() * 99999) + 1),
     name:body.name,
