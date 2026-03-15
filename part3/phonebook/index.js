@@ -28,21 +28,21 @@ app.post('/api/persons', (request, response) => {
     error: 'Name or Number missing' 
   })
 }
-  const listOfNames = persons.map(person => person.name.toLowerCase())
-  if (listOfNames.includes(body.name.toLowerCase())) {
-    return response.status(400).json({ 
-    error: 'Name already exists in database, name must be unique' 
-  })
-  }
-  console.log(listOfNames)
-  const person = {
-    id:String(Math.floor(Math.random() * 99999) + 1),
-    name:body.name,
-    number:body.number
-  }
-
-  persons = persons.concat(person)
-  response.json(person)
+  // const listOfNames = persons.map(person => person.name.toLowerCase())
+  // if (listOfNames.includes(body.name.toLowerCase())) {
+  //   return response.status(400).json({ 
+  //   error: 'Name already exists in database, name must be unique' 
+  // })
+  // }
+  // console.log(listOfNames)
+  const person = new Person({
+      name: body.name,
+      number: body.number
+    })
+  
+    person.save().then(savedPerson => {
+      response.json(savedPerson)
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
