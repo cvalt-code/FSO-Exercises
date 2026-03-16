@@ -89,7 +89,11 @@ const App = () => {
         setNewAddedMessage(null)        
       }, 5000)   
       }
-        ))
+        )
+      .catch(error => {
+      // this is the way to access the error message
+      setNewErrorMessage(error.response.data.error)
+    })  )
       }
       else{
         console.log("Not updating ID ", personRepeated.id)
