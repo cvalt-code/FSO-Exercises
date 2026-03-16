@@ -45,14 +45,15 @@ app.post('/api/persons', (request, response) => {
     })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    personsFiltered = persons.find(person => person.id === id)
-      if (personsFiltered) {    
-        response.json(personsFiltered)  
-    } else {    
-        response.status(404).end()  }
-})
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+    .then(person => {
+      if (person) {        
+        response.json(person)      
+      } else {        
+        response.status(404).end()      
+      }    })
+        .catch(error => next(error))})
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
@@ -62,16 +63,39 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.get('/info', (request, response) => {
-    const personLength = persons.length
+app.get('/info', async (request, response, next) => {
+    try {
+    // Use countDocuments() for an accurate count of a specific query
+    const personLength = await Person.countDocuments({});
+    console.log("Number of docs: ", personLength);
     const currentDate = new Date();
     const stringResponse = `<p>Phonebook has info for ${personLength} people</p>
     <p>${currentDate.toString()}</p>
     `;
-    
-  
     response.send(stringResponse)
+      } catch (err) {
+          console.error(error => next(error));
+      }
+})
 
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body
+
+  Person.findById(request.params.id)
+    .then(person => {
+      if (!person) {
+        return response.status(404).end()
+      }
+
+      person.name = name
+      person.number = number
+
+      return person.save().then((updatedPerson) => {
+        response.json(updatedPerson)
+      })
+    })
+    .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
