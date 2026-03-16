@@ -111,6 +111,10 @@ const App = () => {
       }, 5000) 
       setNewName('')
     setNewNumber('')})
+    .catch(error => {
+      // this is the way to access the error message
+      setNewErrorMessage(error.response.data.error)
+    })
   ;}
 }
 
