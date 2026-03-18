@@ -3,7 +3,7 @@ const express = require('express')
 require('dotenv').config()
 
 const app = express()
-const morgan = require('morgan');
+const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
 app.use(express.static('dist'))
@@ -22,61 +22,52 @@ app.get('/api/persons', (request, response) => {
 
 app.post('/api/persons', (request, response,next ) => {
   const body = request.body
-  
   if (!body.name || !body.number) {
-  return response.status(400).json({ 
-    error: 'Name or Number missing' 
-  })
-}
-  // const listOfNames = persons.map(person => person.name.toLowerCase())
-  // if (listOfNames.includes(body.name.toLowerCase())) {
-  //   return response.status(400).json({ 
-  //   error: 'Name already exists in database, name must be unique' 
-  // })
-  // }
-  // console.log(listOfNames)
+    return response.status(400).json({
+      error: 'Name or Number missing'
+    })
+  }
   const person = new Person({
-      name: body.name,
-      number: body.number
-    })
-  
-    person.save().then(savedPerson => {
-      response.json(savedPerson)
-    })
+    name: body.name,
+    number: body.number
+  })
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
     .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
     .then(person => {
-      if (person) {        
-        response.json(person)      
-      } else {        
-        response.status(404).end()      
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
       }    })
-        .catch(error => next(error))})
+    .catch(error => next(error))})
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
 })
 
 app.get('/info', async (request, response, next) => {
-    try {
+  try {
     // Use countDocuments() for an accurate count of a specific query
-    const personLength = await Person.countDocuments({});
-    console.log("Number of docs: ", personLength);
-    const currentDate = new Date();
+    const personLength = await Person.countDocuments({})
+    console.log('Number of docs: ', personLength)
+    const currentDate = new Date()
     const stringResponse = `<p>Phonebook has info for ${personLength} people</p>
     <p>${currentDate.toString()}</p>
-    `;
+    `
     response.send(stringResponse)
-      } catch (err) {
-          console.error(error => next(error));
-      }
+  } catch (error) {
+    next(error)
+  }
 })
 
 
@@ -110,9 +101,9 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  }  else if (error.name === 'ValidationError') {    
-      return response.status(400).json({ error: error.message })
-  } 
+  }  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
   next(error)
 }
@@ -120,7 +111,7 @@ const errorHandler = (error, request, response, next) => {
 // this has to be the last loaded middleware, also all the routes should be registered before this!
 app.use(errorHandler)
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
