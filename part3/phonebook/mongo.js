@@ -23,25 +23,25 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 
 if (process.argv.length === 3)
-{console.log('Phonebook:');
+{console.log('Phonebook:')
   Person.find({}).then(result => {
-  result.forEach(note => {
-    console.log(note.name , note.number)
-  })
-  mongoose.connection.close()
-})}
+    result.forEach(note => {
+      console.log(note.name , note.number)
+    })
+    mongoose.connection.close()
+  })}
 
 else{
 
-const name = process.argv[3]
-const number = process.argv[4]
+  const name = process.argv[3]
+  const number = process.argv[4]
 
-const note = new Person({name,number})
+  const note = new Person({ name,number })
 
-note.save().then(result => {
-  console.log('New contact saved!')
-  mongoose.connection.close()
-})
+  note.save().then(() => {
+    console.log('New contact saved!')
+    mongoose.connection.close()
+  })
 
 
 }
