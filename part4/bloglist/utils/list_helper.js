@@ -91,8 +91,25 @@ const mostBlogs = (blogs) => {
     return most
 }
 
+const mostLikes = (blogs) => {
+    const result = _(blogs)
+    .groupBy('author') 
+    .mapValues(entries => _.sumBy(entries, 'likes')) 
+    .value(); 
 
+    const highestKey = _.maxBy(_.keys(result), function(key) {
+        return result[key];
+        });
+    
+    const most = {
+        "author": highestKey,
+        "likes": result[highestKey]
+    }
+    return most;
+}
+
+console.log(mostLikes(blogs))
 
 module.exports = {
-  dummy, totalLikes, favoriteBlog
+  dummy, totalLikes, favoriteBlog, mostBlogs
 }
