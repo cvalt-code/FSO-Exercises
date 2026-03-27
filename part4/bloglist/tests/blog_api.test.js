@@ -45,6 +45,28 @@ test.only('unique identifier property of the blog posts is named id', async () =
   assert.ok('id' in response.body[0], 'Key "id" should exist');
 })
 
+test('a valid blog can be added ', async () => {
+  const newBlog = {
+    title: 'New Blog',
+    author: 'test Author',
+    url: 'www.blog.com',
+    likes: 4,
+    id: 'dajdasdaje3423'
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await api.get('/api/blogs')
+  //console.log(blogsAtEnd)
+  assert.strictEqual(blogsAtEnd.body.length, initialBlogs.length + 1)
+  const contents = blogsAtEnd.body.map(n => n.title)  
+  assert(contents.includes('New Blog'))
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
