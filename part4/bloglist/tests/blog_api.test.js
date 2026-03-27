@@ -41,7 +41,6 @@ test.only('blog list application returns the correct amount of blog posts', asyn
 
 test.only('unique identifier property of the blog posts is named id', async () => {
   const response = await api.get('/api/blogs')
-  console.log(response)
   assert.ok('id' in response.body[0], 'Key "id" should exist');
 })
 
@@ -83,6 +82,23 @@ test('a blog without likes can be added ', async () => {
 //   const blogsAtEnd = await api.get('/api/blogs')
 //   //console.log(blogsAtEnd)
   assert.strictEqual(0, addedBlog.body.likes)
+//   const contents = blogsAtEnd.body.map(n => n.title)  
+//   assert(contents.includes('New Blog'))
+})
+
+test('a blog without title or url CANT be added', async () => {
+  const newBlog = {
+    author: 'test Author'
+  }
+
+  const addedBlog = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+  
+  const blogsAtEnd = await api.get('/api/blogs')
+//   //console.log(blogsAtEnd)
+   assert.strictEqual(blogsAtEnd.body.length, initialBlogs.length)
 //   const contents = blogsAtEnd.body.map(n => n.title)  
 //   assert(contents.includes('New Blog'))
 })
